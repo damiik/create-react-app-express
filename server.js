@@ -71,7 +71,7 @@ binance.sell("ETHBTC", quantity, price, {stopPrice: stopPrice, type: type});
 
 app.get('/api/currences', (req, res) => {
 
-  let response = binance.prices( (error, ticker) => {
+  let response = binance.prices( (error, ticker) => { // latest pirces
 
     let response = [
 
@@ -81,7 +81,7 @@ app.get('/api/currences', (req, res) => {
       {name: "LTC", btc: ticker.LTCBTC, usd:(ticker.LTCBTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.LTCBTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: (ticker.LTCBTC * ticker.BTCUSDT * dolarCoursePLN * 0.52223809).toFixed(2)},
       {name: "LSK", btc: ticker.LSKBTC, usd: (ticker.LSKBTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.LSKBTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: '0.0' }
     ];
-    //console.log(response);
+    console.log(response);
     res.send({ express: response });
   });
 });
