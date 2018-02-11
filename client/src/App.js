@@ -1,37 +1,88 @@
 import React, { Component } from 'react';
 
+
 import logo from './logo.svg';
+import ReactTable from 'react-table'
 
 import './App.css';
 
-class App extends Component {
-  state = {
-    response: ''
-  };
+let getJSON = x => { 
+  
+  var contentType = x.headers.get("content-type"); 
+  if(contentType && contentType.includes("application/json")) return x.json();
 
-  componentDidMount() {
-    this.callApi()
-      .then(res => this.setState({ response: res.express }))
-      .catch(err => console.log(err));
+  throw new TypeError("Oops, we haven't got JSON!");
+}
+
+class App extends Component {
+
+  constructor() {
+    super();
   }
 
-  callApi = async () => {
-    const response = await fetch('/api/hello');
-    const body = await response.json();
-
-    if (response.status !== 200) throw Error(body.message);
-
-    return body;
+  state = {
+    courses: [],
+    elapsed: 0,
+    start: Date.now()
   };
+  start= Date.now()
+
+  componentDidMount() {
+
+    // componentDidMount is called by react when the component 
+    // has been rendered on the page.
+    this.timer = setInterval(this.tick.bind(this), 1000);
+  }
+
+  componentWillUnmount() {
+
+    // This method is called immediately before the component is removed
+    // from the page and destroyed. We can clear the interval here:
+
+    clearInterval(this.timer);
+  }
+
+  tick() {
+
+    console.log("tick..")
+    // This function is called every 50 ms. It updates the 
+    // elapsed counter. Calling setState causes the component to be re-rendered
+
+    fetch('/api/currences')
+    .then( getJSON )
+    .then(x => {
+    
+      this.setState({ courses: x.express }); 
+      console.log( x.express )
+    })
+    .catch(error => { console.log( error ); });
+
+
+    //this.setState({ elapsed: new Date() - this.start});// this.props.start });
+  }
 
   render() {
+
+    let data = this.state.courses.map ? this.state.courses : [{name:"", btc:"", usd: "", pln:"", total:""}]
+    let columns = [
+      { Header: 'Crypto', accessor: 'name', minWidth: 40},
+      { Header: 'Price BTC', accessor: 'btc', minWidth: 40},
+      { Header: 'Price USDT', accessor: 'usd', minWidth: 40},
+      { Header: 'Price PLN', accessor: 'pln', minWidth: 40},
+      { Header: 'Total PLN', accessor: 'total', minWidth: 40}
+    ]
+
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">{this.state.response}</p>
+          <h1 className="App-title">Current Binance prices:</h1>
+        </header><div> 
+        
+          <ReactTable defaultPageSize="8" data={data}  columns={columns}
+          />
+        </div>
+        
       </div>
     );
   }
