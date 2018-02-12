@@ -32,15 +32,15 @@ request({
 //   console.log("balances()", balances);
 //   console.log("ETH balance: ", balances.ETH.available);
 // });
-binance.bookTickers((error, ticker) => {
-  //console.log("bookTickers", ticker);
-  console.log("Price of EOS: ", ticker.EOSBTC);
-});
+// binance.bookTickers((error, ticker) => {
+//   //console.log("bookTickers", ticker);
+//   console.log("Price of EOS: ", ticker.EOSBTC);
+// });
 
-binance.bookTickers((error, ticker) => {
-  //console.log("bookTickers", ticker);
-  console.log("Price of ADA: ", ticker.ADABTC);
-});
+// binance.bookTickers((error, ticker) => {
+//   //console.log("bookTickers", ticker);
+//   console.log("Price of ADA: ", ticker.ADABTC);
+// });
 
 
 /*
