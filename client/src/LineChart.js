@@ -56,20 +56,15 @@ const d3 = require('d3');
 // }
 
 // Line Component
-const Line = ({ scales, data }) => {
+const Line = ( {scales, data} ) => {
+
     const { xScale, yScale } = scales;
     const line = d3.line()
-        .x((d) => xScale(d.year))
-        .y((d) => yScale(d.income))
+        .x(( d ) => xScale( d.year ))
+        .y(( d ) => yScale( d.income ))
         .curve(d3.curveMonotoneX);
 
-    const path =
-        <path
-            d={line(data)}
-            stroke="#FFF056"
-            strokeWidth="3px"
-            fill="none"
-        />
+    const path =  <path d={ line( data ) } stroke="#FFF056" strokeWidth="3px" fill="none" />
     return (
         <g>{path}</g>
     )
@@ -84,7 +79,6 @@ class LineChart extends Component {
     };
 
     render() {
-
 
         var margin = { top: 5, right: 50, bottom: 20, left: 50 },
             w = this.props.width - (margin.left + margin.right),
@@ -115,8 +109,7 @@ class LineChart extends Component {
         var line = d3.line()
             .x((d) => { return x(d.date); })
             .y((d) => { return y(d.count);})
-            .curve(d3.curveBasis);
-
+            .curve(d3.curveLinear); //curveMonotoneX curveBasis
 
         var transform = 'translate(' + margin.left + ',' + margin.top + ')';
 

@@ -1,10 +1,80 @@
 const express = require('express');
-const binance = require('node-binance-api');
-var request = require("request"); // for usd curse
+//const binance = require('node-binance-api');
+//var request = require("request"); // for usd curse
+const co = require('co'); // for promises generator function
+const apis = require('./apis');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.get('/api/currences', (req, res) => {
+
+  co( apis.exchangesRates ).then(( result ) => {
+
+    let nbpUSDPLN = result.nbpUSDPLN.body.rates[0].bid;
+    let bitBTCPLN = result.bitBTCPLN.body.bid;
+    let bitLTCPLN = result.bitLTCPLN.body.bid;
+    let bitLSKPLN = result.bitLSKPLN.body.bid;
+    let binADABTC = result.binADABTC.data[0].p;
+    let binEOSBTC = result.binEOSBTC.data[0].p;
+    let binLTCBTC = result.binLTCBTC.data[0].p;
+    let binLSKBTC = result.binLSKBTC.data[0].p;
+    let binBTCUSDT = result.binBTCUSDT.data[0].p;
+
+    // console.log("nbpUSDPLN:" + JSON.stringify(result.nbpUSDPLN.body));
+    // console.log("bitBTCPLN:" + JSON.stringify(result.bitBTCPLN.body));
+    // console.log("bitLTCPLN:" + JSON.stringify(result.bitLTCPLN.body));
+    // console.log("bitLSKPLN:" + JSON.stringify(result.bitLSKPLN.body));
+    // console.log("binADABTC:" + JSON.stringify(result.binADABTC.data[0]));
+    // console.log("binEOSBTC:" + JSON.stringify(result.binEOSBTC.data[0]));
+
+    console.log("nbpUSDPLN:" + nbpUSDPLN);
+    console.log("bitBTCPLN:" + bitBTCPLN);
+    console.log("bitLTCPLN:" + bitLTCPLN);
+    console.log("bitLSKPLN:" + bitLSKPLN);
+    console.log("binADABTC:" + binADABTC);
+    console.log("binEOSBTC:" + binEOSBTC);
+
+    res.send({ express: [
+
+        { name: "BTC", btc: '1.0', usd: (1.0 * binBTCUSDT).toFixed(2), pln: (binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitBTCPLN).toFixed(2), bittotal: '0.0', total: '0.0'},
+        { name: "ADA", btc: binADABTC, usd: (binADABTC * binBTCUSDT).toFixed(2), pln: (binADABTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binADABTC * bitBTCPLN).toFixed(2), bittotal: (binADABTC * bitBTCPLN * 312.5).toFixed(2), total: (binADABTC * binBTCUSDT * nbpUSDPLN * 312.5).toFixed(2)},
+        { name: "EOS", btc: binEOSBTC, usd: (binEOSBTC * binBTCUSDT).toFixed(2), pln: (binEOSBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binEOSBTC * bitBTCPLN).toFixed(2), bittotal: (binEOSBTC * bitBTCPLN * 5.999).toFixed(2), total: (binEOSBTC * binBTCUSDT * nbpUSDPLN * 5.999).toFixed(2)},
+        { name: "LTC", btc: binLTCBTC, usd: (binLTCBTC * binBTCUSDT).toFixed(2), pln: (binLTCBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitLTCPLN).toFixed(2), bittotal: (bitLTCPLN * 0.52223809).toFixed(2), total: (binLTCBTC * binBTCUSDT * nbpUSDPLN * 0.52223809).toFixed(2)},
+        { name: "LSK", btc: binLSKBTC, usd: (binLSKBTC * binBTCUSDT).toFixed(2), pln: (binLSKBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitLSKPLN).toFixed(2), bittotal: (bitLTCPLN * 0.0).toFixed(2), total: '0.0' }
+      ]
+    });
+  })
+  .catch(( err ) => {
+
+      console.error(err.stack);
+  });
+
+});
+
+
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 binance.options({
 
   APIKEY: 'vRxtFMqMvoJVaV9psSGv3DNxv8YtcVzuLREy2Mmzaz0TnAwO2tvCvUkzUk1bM0pY',
@@ -12,7 +82,40 @@ binance.options({
   useServerTime: true, // If you get timestamp errors, synchronize to server time at startup
   test: true // If you want to use sandbox mode where orders are simulated
 });
+*/
 
+/*
+[ 1518526200000,
+[0]     '0.00004043',
+[0]     '0.00004052',
+[0]     '0.00004041',
+[0]     '0.00004047',
+[0]     '420414.00000000',
+[0]     1518526499999,
+[0]     '17.00206547',
+[0]     208,
+[0]     '366182.00000000',
+[0]     '14.80920658',
+[0]     '0' ]
+*/
+/*
+app.get('/api/candles', (req, res) => {
+
+  // Periods: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
+  binance.candlesticks(req.query.currences, req.query.time, function (error, ticks) {
+    
+    //console.log("candlesticks()", ticks);
+    let last_tick = ticks[ticks.length - 1];
+    let [time, open, high, low, close, volume, closeTime, assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored] = last_tick;
+    console.log(req.query.currences + ":" + close);
+
+    //console.log(response);
+    res.send({ express: ticks });
+  });
+});
+*/
+
+/*
 let dolarCoursePLN = 0.0;
 
 request({
@@ -25,8 +128,7 @@ request({
     //console.log(body) // Print the json response
   }
 })
-
-
+*/
 
 
 // binance.balance((error, balances) => {
@@ -74,55 +176,3 @@ let stopPrice = 0.068;
 binance.sell("ETHBTC", quantity, price, {stopPrice: stopPrice, type: type});
 
 */
-
-
-app.get('/api/currences', (req, res) => {
-
-
-  let response = binance.prices( (error, ticker) => { // latest pirces
-
-    let response = [
-
-      {name: "BTC", btc: '1.0', usd:ticker.BTCUSDT, pln: (ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: '0.0'},
-      {name: "ADA", btc: ticker.ADABTC, usd:(ticker.ADABTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.ADABTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: (ticker.ADABTC * ticker.BTCUSDT * dolarCoursePLN * 312.5).toFixed(2)},
-      {name: "EOS", btc: ticker.EOSBTC, usd:(ticker.EOSBTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.EOSBTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: (ticker.EOSBTC * ticker.BTCUSDT * dolarCoursePLN * 5.999).toFixed(2)},
-      {name: "LTC", btc: ticker.LTCBTC, usd:(ticker.LTCBTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.LTCBTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: (ticker.LTCBTC * ticker.BTCUSDT * dolarCoursePLN * 0.52223809).toFixed(2)},
-      {name: "LSK", btc: ticker.LSKBTC, usd:(ticker.LSKBTC * ticker.BTCUSDT).toFixed(2), pln: (ticker.LSKBTC * ticker.BTCUSDT * dolarCoursePLN).toFixed(2), total: '0.0' }
-    ];
-    //console.log(response);
-    res.send({express: response });
-  });
-});
-
-
-/*
-[ 1518526200000,
-[0]     '0.00004043',
-[0]     '0.00004052',
-[0]     '0.00004041',
-[0]     '0.00004047',
-[0]     '420414.00000000',
-[0]     1518526499999,
-[0]     '17.00206547',
-[0]     208,
-[0]     '366182.00000000',
-[0]     '14.80920658',
-[0]     '0' ]
-*/
-app.get('/api/candles', (req, res) => {
-
-  // Periods: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
-  binance.candlesticks(req.query.currences, req.query.time, function (error, ticks) {
-    
-    //console.log("candlesticks()", ticks);
-    let last_tick = ticks[ticks.length - 1];
-    let [time, open, high, low, close, volume, closeTime, assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored] = last_tick;
-    console.log(req.query.currences + ":" + close);
-
-    //console.log(response);
-    res.send({ express: ticks });
-  });
-});
-
-
-app.listen(port, () => console.log(`Listening on port ${port}`));

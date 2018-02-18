@@ -54,7 +54,7 @@ class App extends Component {
 
     // componentDidMount is called by react when the component
     // has been rendered on the page.
-    this.timer = setInterval(this.tick.bind(this), 2000);
+    this.timer = setInterval(this.tick.bind(this), 5000); //  //"Rate limit exceeded (600r/10m) - IP banned for 10 minutes" (nie mniej niż 3000 przy 3 zapytaniach  do bitbay)
 
     // var request = new Request({
     //   url: '/api/candles/?currences=BTCUSDT&time=5m',
@@ -119,11 +119,12 @@ class App extends Component {
     clearInterval(this.timer);
   }
 
+
   tick() {
+
     console.log("tick..")
     // This function is called every 50 ms. It updates the
     // elapsed counter. Calling setState causes the component to be re-rendered
-
 
     fetch('/api/currences')
     .then( getJSON )
@@ -134,23 +135,24 @@ class App extends Component {
     })
     .catch(error => { console.log( error ); });
 
-
-
     this.setState({ elapsed: new Date() - this.state.start});// this.props.start });
   }
 
+  
   render() {
 
-    let data = this.state.courses.map ? this.state.courses : [{name:"", btc:"", usd: "", pln:"", total:""}]
+    let data = this.state.courses.map ? this.state.courses : [{name:"", btc:"", usd: "", pln:"", bitpln:"", total:""}]
     let columns = [
       { Header: 'Crypto', accessor: 'name', minWidth: 40},
       { Header: 'Price BTC', accessor: 'btc', minWidth: 40},
       { Header: 'Price USDT', accessor: 'usd', minWidth: 40},
       { Header: 'Price PLN', accessor: 'pln', minWidth: 40},
-      { Header: 'Total PLN', accessor: 'total', minWidth: 40}
+      { Header: 'Bit Price PLN', accessor: 'bitpln', minWidth: 40 },
+      { Header: 'Total PLN', accessor: 'total', minWidth: 40},
+      { Header: 'Bit Total PLN', accessor: 'bittotal', minWidth: 40 }
     ]
 
-    let dataLine = { date: new Date(), count: data[1] ? (parseFloat(data[1].total) + parseFloat(data[2].total) + parseFloat(data[3].total) -800) *2 : 0  }
+    let dataLine = { date: new Date(), count: data[1] ? (parseFloat(data[1].bittotal) + parseFloat(data[2].bittotal) + parseFloat(data[3].bittotal) -800) *2 : 0  }
     
     if(dataLine.count > 0) this.data.push(dataLine);
     if (this.data.length > 2000) this.data.shift();
