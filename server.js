@@ -1,4 +1,5 @@
 const express = require('express');
+// const bodyParser = require('body-parser');
 //const binance = require('node-binance-api');
 //var request = require("request"); // for usd curse
 const co = require('co'); // for promises generator function
@@ -7,19 +8,42 @@ const apis = require('./apis');
 const app = express();
 const port = process.env.PORT || 5000;
 
+// app.use(bodyParser.json()); // for parsing application/json
+// app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+app.get('/api/trades/:symbol/:limit', (req, res) => {
+  //console.log("get>>>>>>>>>>>>>>>>" + req.params.symbol)
+  apis.binanceAPI.getAggregateTrades({
+
+    symbol: req.params.symbol,   //'ADABTC',
+    limit: req.params.limit      //Default: 500; max 500
+  }).then(( result ) => {
+
+   // console.log("success>>>>>>>>>>>>>>>>" + req.params.symbol)
+    //console.log( result.data );
+    res.send( result.data );
+  })
+  .catch(( err ) => {
+
+    console.log("fail>>>>>>>>>>>>>>>>" + req.params.symbol)
+    console.error(err.stack);
+  });
+});
+
+
 app.get('/api/currences', (req, res) => {
 
   co( apis.exchangesRates ).then(( result ) => {
 
-    let nbpUSDPLN = result.nbpUSDPLN.body.rates[0].bid;
-    let bitBTCPLN = result.bitBTCPLN.body.bid;
-    let bitLTCPLN = result.bitLTCPLN.body.bid;
-    let bitLSKPLN = result.bitLSKPLN.body.bid;
-    let binADABTC = result.binADABTC.data[0].p;
-    let binEOSBTC = result.binEOSBTC.data[0].p;
-    let binLTCBTC = result.binLTCBTC.data[0].p;
-    let binLSKBTC = result.binLSKBTC.data[0].p;
-    let binBTCUSDT = result.binBTCUSDT.data[0].p;
+    let nbpUSDPLN = result.nbpUSDPLN.body.rates ? (result.nbpUSDPLN.body.rates[0] ? result.nbpUSDPLN.body.rates[0].bid : 0.0) : 0.0;
+    let bitBTCPLN = result.bitBTCPLN.body.last;
+    let bitLTCPLN = result.bitLTCPLN.body.last;
+    let bitLSKPLN = result.bitLSKPLN.body.last;
+    let binADABTC = result.binADABTC.data[0] ? result.binADABTC.data[0].p : 0.0;
+    let binEOSBTC = result.binEOSBTC.data[0] ? result.binEOSBTC.data[0].p : 0.0;
+    let binLTCBTC = result.binLTCBTC.data[0] ? result.binLTCBTC.data[0].p : 0.0;
+    let binLSKBTC = result.binLSKBTC.data[0] ? result.binLSKBTC.data[0].p : 0.0;
+    let binBTCUSDT = result.binBTCUSDT.data[0] ? result.binBTCUSDT.data[0].p : 0.0;
 
     // console.log("nbpUSDPLN:" + JSON.stringify(result.nbpUSDPLN.body));
     // console.log("bitBTCPLN:" + JSON.stringify(result.bitBTCPLN.body));
@@ -38,9 +62,9 @@ app.get('/api/currences', (req, res) => {
     res.send({ express: [
 
         { name: "BTC", btc: '1.0', usd: (1.0 * binBTCUSDT).toFixed(2), pln: (binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitBTCPLN).toFixed(2), bittotal: '0.0', total: '0.0'},
-        { name: "ADA", btc: binADABTC, usd: (binADABTC * binBTCUSDT).toFixed(2), pln: (binADABTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binADABTC * bitBTCPLN).toFixed(2), bittotal: (binADABTC * bitBTCPLN * 312.5).toFixed(2), total: (binADABTC * binBTCUSDT * nbpUSDPLN * 312.5).toFixed(2)},
-        { name: "EOS", btc: binEOSBTC, usd: (binEOSBTC * binBTCUSDT).toFixed(2), pln: (binEOSBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binEOSBTC * bitBTCPLN).toFixed(2), bittotal: (binEOSBTC * bitBTCPLN * 5.999).toFixed(2), total: (binEOSBTC * binBTCUSDT * nbpUSDPLN * 5.999).toFixed(2)},
-        { name: "LTC", btc: binLTCBTC, usd: (binLTCBTC * binBTCUSDT).toFixed(2), pln: (binLTCBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitLTCPLN).toFixed(2), bittotal: (bitLTCPLN * 0.52223809).toFixed(2), total: (binLTCBTC * binBTCUSDT * nbpUSDPLN * 0.52223809).toFixed(2)},
+        { name: "ADA", btc: binADABTC, usd: (binADABTC * binBTCUSDT).toFixed(2), pln: (binADABTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binADABTC * bitBTCPLN).toFixed(2), bittotal: (binADABTC * bitBTCPLN * 602.264).toFixed(2), total: (binADABTC * binBTCUSDT * nbpUSDPLN * 602.264).toFixed(2)},
+      { name: "EOS", btc: binEOSBTC, usd: (binEOSBTC * binBTCUSDT).toFixed(2), pln: (binEOSBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (binEOSBTC * bitBTCPLN).toFixed(2), bittotal: (binEOSBTC * bitBTCPLN * 30.17919).toFixed(2), total: (binEOSBTC * binBTCUSDT * nbpUSDPLN * 30.17919).toFixed(2)},
+        { name: "LTC", btc: binLTCBTC, usd: (binLTCBTC * binBTCUSDT).toFixed(2), pln: (binLTCBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitLTCPLN).toFixed(2), bittotal: (bitLTCPLN * 0.0).toFixed(2), total: (binLTCBTC * binBTCUSDT * nbpUSDPLN * 0.0).toFixed(2)},
         { name: "LSK", btc: binLSKBTC, usd: (binLSKBTC * binBTCUSDT).toFixed(2), pln: (binLSKBTC * binBTCUSDT * nbpUSDPLN).toFixed(2), bitpln: (bitLSKPLN).toFixed(2), bittotal: (bitLTCPLN * 0.0).toFixed(2), total: '0.0' }
       ]
     });
@@ -54,7 +78,7 @@ app.get('/api/currences', (req, res) => {
 
 
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => console.log(`Listening on port.. ${port}`));
 
 
 

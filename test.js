@@ -56,7 +56,7 @@ co(function* () {
 
             symbol: 'EOSBTC',
             limit: 1      //Default: 500; max 500
-        })
+        }) //{"a":6133060,"p":"0.00065134","q":"3.00000000","f":6706317,"l":6706317,"T":1521064208612,"m":false,"M":true}
     }
     return allJsons;
 
@@ -64,9 +64,9 @@ co(function* () {
 .then(( result ) => {
 
     let nbpUSDPLN = result.nbpUSDPLN.body.rates[0].bid;
-    let bitBTCPLN = result.bitBTCPLN.body.bid;
-    let bitLTCPLN = result.bitLTCPLN.body.bid;
-    let bitLSKPLN = result.bitLSKPLN.body.bid;
+    let bitBTCPLN = result.bitBTCPLN.body.last;
+    let bitLTCPLN = result.bitLTCPLN.body.last;
+    let bitLSKPLN = result.bitLSKPLN.body.last;
     let binADABTC = result.binADABTC.data[0].p;
     let binEOSBTC = result.binEOSBTC.data[0].p;
 

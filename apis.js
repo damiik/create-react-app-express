@@ -42,14 +42,45 @@ co(apis.apiGenerator).then((result) => {
 
 
 
-binanceAPI = Object.create(binance);
+binanceAPI = Object.create( binance );
 binanceAPI.init({
 
     apiKey: 'vRxtFMqMvoJVaV9psSGv3DNxv8YtcVzuLREy2Mmzaz0TnAwO2tvCvUkzUk1bM0pY',
     secretKey: '4hkTl7fuN5FMlHCal1k2Vbhpbkq3y2TxVWjhWOieyevrO2mwzEGtog1Og9AVEjsT'
 });
 
+//
+/* ostatnia transakcja bitbay: https://bitbay.net/API/Public/LSKPLN/market.json
+transactions[0] = {
 
+    date: 1519251915
+    price: 70.97
+    type: "buy"
+    amount: 2.0305763
+    tid: "1506771" 
+}
+
+// po odczytaniu id ostatniej transakcji (tid) można wyciągnąć odpowiednią ilość trades:
+var url2 = 'https://bitbay.net/API/Public/LSKPLN/trades.json?since=' + queryCounter
+
+date 1467112853       (konwersja na datę: new Date(transaction.date * 1e3).toISOString().slice(0, -5) )
+price 3.8
+type "buy"
+amount 5.22548008
+tid "5"
+6
+date 1467113254
+price 3.5
+type "sell"
+amount 15.22200012
+tid "6"
+
+
+* lepszą opcją jest posiadanie bazy transakcji i dogrywanie danych, wtedy po restarcie wystarczy pobrać dane od ostatniej transakcji w bazie
+
+*/
+
+exports.binanceAPI = binanceAPI;
 
 exports.exchangesRates = function* () { // generator function to accumulate promises - for co.js library
 
@@ -113,3 +144,28 @@ exports.exchangesRates = function* () { // generator function to accumulate prom
     return allJsons;
 }
 
+
+/*
+api.getAggregateTrades(options)
+
+options = {
+  symbol: 'string',   MANDATORY
+  fromId: integer,
+  startTime: integer, UNIX dateTime
+  endTime: integer,   UNIX dateTime
+  limit: integer      Default: 500; max 500
+}
+
+api.getCandles(options)
+
+options = {
+  symbol: 'string',   MANDATORY
+  interval: ENUM,     MANDATORY
+  limit: integer,     Default: 500; max 500
+  startTime: integer, UNIX dateTime
+  endTime: integer    UNIX dateTime
+}
+*/
+
+
+// symbol umieszczony w kontekscie ma znaczenie - staje się infomacją (rzeczywistością - lub elementem rzeczywistosci (częścią))
